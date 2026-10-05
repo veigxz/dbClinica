@@ -1,0 +1,42 @@
+﻿@model appReversotask.Models.LoginViewModel
+
+@{
+    ViewData["Title"] = "Acesso ao Sistema";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white text-center">
+                <h4>Clínica Vida & Saúde</h4>
+                <small>Acesso do Paciente</small>
+            </div>
+            <div class="card-body">
+                <form asp-action="Login" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Cpf" class="form-label"></label>
+                        <input asp-for="Cpf" class="form-control" placeholder="Digite seu CPF (ex: 111.222.333-44)" />
+                        <span asp-validation-for="Cpf" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Entrar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <p class="mb-0">Ainda não tem cadastro?</p>
+                <a asp-controller="Paciente" asp-action="Create" class="btn btn-link">Cadastre-se aqui</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+  }
+
