@@ -25,7 +25,7 @@ namespace appReversotask.Controllers
 
         // GET: Consulta
         // Lista as consultas do paciente autenticado
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string pesquisa)
         {
             // Obtém o ID do paciente logado através da Session
             var pacienteId = HttpContext.Session.GetInt32("PacienteId");
@@ -37,13 +37,25 @@ namespace appReversotask.Controllers
             }
 
             // Busca somente as consultas pertencentes ao paciente logado
-            var consultas = await _context.Consulta
+            var consultas = _context.Consulta
                 .Include(c => c.Medico)
                 .Include(c => c.Paciente)
-                .Where(c => c.PacienteId == pacienteId.Value)
-                .ToListAsync();
+                .Where(c => c.PacienteId == pacienteId.Value);
 
-            return View(consultas);
+            // Aplica o filtro caso o usuário tenha digitado alguma coisa
+            if (!string.IsNullOrWhiteSpace(pesquisa))
+            {
+                pesquisa = pesquisa.Trim();
+
+                consultas = consultas.Where(c =>
+                    c.StatusConsulta.Contains(pesquisa) ||
+                    c.Medico.Nome.Contains(pesquisa) ||
+                    c.DataHora.ToString().Contains(pesquisa)
+                );
+            }
+
+            return View(await consultas.ToListAsync());
+
         }
 
         // GET: Consulta/Details/5
