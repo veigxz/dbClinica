@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using appReversotask.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using appReversotask.Models;
 
-namespace appReverso.Controllers
+namespace appReversotask.Controllers
 {
     public class AccountController : Controller
     {
@@ -20,10 +20,12 @@ namespace appReverso.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            // Verifica se o paciente já está autenticado
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Consulta");
             }
+
             return View();
         }
 
@@ -32,39 +34,84 @@ namespace appReverso.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            // Busca o paciente pelo CPF digitado
-            var paciente = await _context.Pacientes
-                .FirstOrDefaultAsync(p => p.Cpf == model.Cpf);
-
-            if (paciente == null)
+            // Verifica se os dados informados são válidos
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("", "CPF não encontrado. Faça seu cadastro primeiro.");
                 return View(model);
             }
 
-            // Criando os dados da sessão (Claims)
+            // Busca o paciente pelo CPF informado
+            var paciente = await _context.Pacientes
+                .FirstOrDefaultAsync(p => p.Cpf == model.Cpf);
+
+            // Caso o CPF não seja encontrado
+            if (paciente == null)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "CPF não encontrado. Faça seu cadastro primeiro."
+                );
+
+                return View(model);
+            }
+
+            // Cria os dados de autenticação do paciente
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, paciente.Codigo.ToString()),
-                new Claim(ClaimTypes.Name, paciente.Nome),
-                new Claim("CPF", paciente.Cpf)
+                // Identifica o paciente através do Código
+                new Claim(
+                    ClaimTypes.NameIdentifier,
+                    paciente.Codigo.ToString()
+                ),
+
+                // Nome do paciente
+                new Claim(
+                    ClaimTypes.Name,
+                    paciente.Nome
+                ),
+
+                // CPF do paciente
+                new Claim(
+                    "CPF",
+                    paciente.Cpf
+                )
             };
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            // Cria a identidade utilizando autenticação por Cookies
+            var claimsIdentity = new ClaimsIdentity(
+                claims,
+                CookieAuthenticationDefaults.AuthenticationScheme
+            );
 
+            // Realiza o login do paciente
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity));
+                new ClaimsPrincipal(claimsIdentity)
+            );
 
+            // Salva o ID do paciente na Session
+            // para ser utilizado posteriormente pela ConsultaController
+            HttpContext.Session.SetInt32(
+                "PacienteId",
+                paciente.Codigo
+            );
+
+            // Após o login, direciona o paciente para a lista de consultas
             return RedirectToAction("Index", "Consulta");
         }
 
         // GET: /Account/Logout
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            // Limpa todos os dados armazenados na Session
+            HttpContext.Session.Clear();
+
+            // Encerra a autenticação por Cookies
+            await HttpContext.SignOutAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme
+            );
+
+            // Retorna para a tela de login
             return RedirectToAction("Login");
         }
     }

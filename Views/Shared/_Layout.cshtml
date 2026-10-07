@@ -22,19 +22,39 @@
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <span class="nav-link text-dark">Olá, <strong>@User.Identity.Name</strong></span>
+                                <a class="nav-link text-dark"
+                                   asp-controller="Consulta"
+                                   asp-action="Index">
+                                    Minhas Consultas
+                                </a>
                             </li>
+
                             <li class="nav-item">
-                                <a class="nav-link text-danger" asp-controller="Account" asp-action="Logout">Sair</a>
+                                <span class="nav-link text-dark">
+                                    Olá, <strong>@User.Identity.Name</strong>
+                                </span>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-danger"
+                                   asp-controller="Account"
+                                   asp-action="Logout">
+                                    Sair
+                                </a>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-primary" asp-controller="Account" asp-action="Login">Entrar</a>
+                                <a class="nav-link text-primary"
+                                   asp-controller="Account"
+                                   asp-action="Login">
+                                    Entrar
+                                </a>
                             </li>
                         }
                     </ul>
+
                 </div>
             </div>
         </nav>

@@ -1,42 +1,94 @@
-﻿@model appReversotask.Models.LoginViewModel
+﻿@* Define o modelo utilizado pela tela de Login *@
+@model appReversotask.Models.LoginViewModel
 
 @{
+    // Define o título da página
     ViewData["Title"] = "Acesso ao Sistema";
 }
 
 <div class="row justify-content-center mt-5">
     <div class="col-md-4">
+
         <div class="card shadow-sm">
+
+            @* Cabeçalho do cartão de Login *@
             <div class="card-header bg-primary text-white text-center">
-                <h4>Clínica Vida & Saúde</h4>
+                <h4>Clínica</h4>
                 <small>Acesso do Paciente</small>
             </div>
+
             <div class="card-body">
+
+                @*
+                Formulário de Login.
+                Os dados serão enviados via POST para a Action Login
+                do AccountController.
+                *@
                 <form asp-action="Login" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
+                    @* Exibe erros gerais de validação *@
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger mb-3">
+                    </div>
+
+                    @* Campo para informar o CPF *@
                     <div class="form-group mb-3">
-                        <label asp-for="Cpf" class="form-label"></label>
-                        <input asp-for="Cpf" class="form-control" placeholder="Digite seu CPF (ex: 111.222.333-44)" />
-                        <span asp-validation-for="Cpf" class="text-danger"></span>
+
+                        @* Label definido através do atributo Display do LoginViewModel *@
+                        <label asp-for="Cpf"
+                               class="form-label">
+                        </label>
+
+                        @* Campo de entrada do CPF *@
+                        <input asp-for="Cpf"
+                               class="form-control"
+                               placeholder="Digite seu CPF (ex: 111.222.333-44)" />
+
+                        @* Mensagem de validação do CPF *@
+                        <span asp-validation-for="Cpf"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
+                    @* Botão de Login *@
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">Entrar</button>
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Entrar
+                        </button>
                     </div>
+
                 </form>
             </div>
+
+            @* Rodapé com opção de cadastro *@
             <div class="card-footer text-center">
-                <p class="mb-0">Ainda não tem cadastro?</p>
-                <a asp-controller="Paciente" asp-action="Create" class="btn btn-link">Cadastre-se aqui</a>
+
+                <p class="mb-0">
+                    Ainda não tem cadastro?
+                </p>
+
+                @*
+                Direciona o paciente para o cadastro.
+                O Controller utilizado agora é Paciente.
+                *@
+                <a asp-controller="Paciente"
+                   asp-action="Create"
+                   class="btn btn-link">
+                    Cadastre-se aqui
+                </a>
+
             </div>
+
         </div>
+
     </div>
 </div>
 
 @section Scripts {
+    @* Carrega os scripts de validação do ASP.NET Core *@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-  }
-
+}
